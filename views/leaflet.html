@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="public/style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+    integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+    crossorigin=""></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-ajax/2.1.0/leaflet.ajax.js"></script>
+    <title>Document</title>
+</head>
+<body>
+
+    <div id="mapid"></div>
+    <div id="description" class="inactive description"></div>
+
+    <script>
+        // returns promise for loading GeoJSON file and adding the Leaflet layer to the layers array
+        async function getGeojsonLayer(fileName, layers) {
+            // loading GeoJSON file - Here my html and usa_adm.geojson file resides in same folder
+            return $.getJSON(fileName, (data) => {
+                // L.geoJson function is used to parse geojson file and load on to map
+                const name = fileName.slice(54, -8);
+                const district = L.geoJSON(data)
+                    .setStyle({
+                        fill: false,
+                        weight: 2 
+                    })
+                    .bindTooltip(name).openTooltip();
+
+                layers.push(district);
+            })
+        }
+
+        // create map; zoom delta controls how much it zooms in/out with each zoom
+        const map = L.map("mapid", {
+            zoomDelta: 0.2
+        });
+
+        const layers = [];
+        const promises = [];
+
+        // get promises for each of the CA state senate districts
+        for (let i = 1; i <= 40; i++) {
+            const promise = getGeojsonLayer(`/ca_state_senate_districts/bp_california state senate district ${i}.geojson`, layers);
+            promises.push(promise);
+        }
+
+        // after all GeoJSON files load, add them to group layer, add to map, and zoom to bounds
+        Promise.all(promises).then( () => {
+            console.log(layers);
+            const group = L.featureGroup(layers);
+            group.addTo(map);
+            map.fitBounds(group.getBounds());
+        });
+
+        // add stadia basemap
+        L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', {
+            maxZoom: 20,
+            attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
+        }).addTo(map);
+    </script>
+</body>
+</html>
+
