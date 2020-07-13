@@ -23,6 +23,10 @@ nunjucks.configure('views', {
     res.render("leaflet.html");
   });
 
+  app.get('/mapbox', async(req, res) => {
+    res.render("mapbox.html");
+  });
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
