@@ -42,32 +42,37 @@
             promises.push(promise);
         }
 
+        var featureCollection = {
+            'type': 'FeatureCollection',
+            'features': []
+        };
+
         // after all GeoJSON files load, add them to group layer, add to map, and zoom to bounds
         Promise.all(promises).then( () => {
             for (let i = 1; i <= 40; i++) {
-                map.addSource(`geojson_${i}`, {
-                type: 'geojson',
-                data: {
+                const feature = {
                     'type': 'Feature',
                     'geometry': layers[i-1]
-                }
+                };
+
+                featureCollection.features.push(feature);
+            }
+
+            map.addSource('featureCollectionID', {
+                type: 'geojson',
+                data: featureCollection
             });
 
             map.addLayer({
-                'id': `geojson_${i}_layer`,
+                'id': 'layerID',
                 'type': 'fill',
-                'source': `geojson_${i}`,
+                'source': 'featureCollectionID',
                 'layout': {},
                 'paint': {
                 'fill-color': '#088',
                 'fill-opacity': 0.8
                 }
             });
-            }
-
-            // const group = L.featureGroup(layers);
-            // group.addTo(map);
-            // map.fitBounds(group.getBounds());
         });
 
     </script>
