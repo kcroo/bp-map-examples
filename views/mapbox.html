@@ -33,6 +33,15 @@
          // Add zoom and rotation controls to the map.
          map.addControl(new mapboxgl.NavigationControl());
 
+        // zoom into CA (couldn't figure out how to zoom to polygon bounds without external library)
+        const swPoint = new mapboxgl.LngLat(-125.177210, 31.602601);
+        const nePoint = new mapboxgl.LngLat(-113.043510, 42.361381);
+        const bounds = new mapboxgl.LngLatBounds(swPoint, nePoint);
+
+        map.fitBounds(bounds, {
+            padding: 20
+        });
+
         const layers = [];
         const promises = [];
 
@@ -41,7 +50,7 @@
             const promise = getGeojsonLayer(`/ca_state_senate_districts/bp_california state senate district ${i}.geojson`, layers);
             promises.push(promise);
         }
-
+        
         var featureCollection = {
             'type': 'FeatureCollection',
             'features': []
