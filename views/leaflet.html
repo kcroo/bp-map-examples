@@ -27,10 +27,11 @@
                 const name = fileName.slice(54, -8);
                 const district = L.geoJSON(data)
                     .setStyle({
-                        fill: true,         // if false, transparent BUT tooltip only appears on lines
+                        fill: true,         // if false, transparent BUT tooltip only appears on lines,
+                        fillOpacity: 0,
                         weight: 2 
                     })
-                    .bindTooltip(name.toUpperCase()).openTooltip();
+                    .bindTooltip(name).openTooltip();
 
                 layers.push(district);
             })
