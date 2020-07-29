@@ -19,13 +19,17 @@ nunjucks.configure('views', {
   express: app
  });
 
- app.get('/leaflet', async(req, res) => {
-    res.render("leaflet.html");
-  });
+app.get('/leaflet', async(req, res) => {
+  res.render("leaflet.html");
+});
 
-  app.get('/mapbox', async(req, res) => {
-    res.render("mapbox.html");
-  });
+app.get('/mapbox', async(req, res) => {
+  res.render("mapbox.html");
+});
+
+app.get('/openlayers', async(req, res) => {
+  res.render("openlayers.html");
+});
 
 
 const PORT = process.env.PORT || 5000;
