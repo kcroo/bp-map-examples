@@ -51,6 +51,7 @@
             promises.push(promise);
         }
         
+        // create your own GeoJSON feature collection
         var featureCollection = {
             'type': 'FeatureCollection',
             'features': []
@@ -58,29 +59,71 @@
 
         // after all GeoJSON files load, add them to group layer, add to map, and zoom to bounds
         Promise.all(promises).then( () => {
+            // create feature for GeoJSON feature collection
             for (let i = 1; i <= 40; i++) {
                 const feature = {
                     'type': 'Feature',
-                    'geometry': layers[i-1]
+                    'geometry': layers[i-1],
+                    'properties': {
+                        'name': `District ${i}`
+                    }
                 };
 
                 featureCollection.features.push(feature);
             }
 
+            console.log(featureCollection);
+
+            // add feature collection as dat source to map
             map.addSource('featureCollectionID', {
                 type: 'geojson',
                 data: featureCollection
             });
 
+            // creates layers for each feature in feature collection
             map.addLayer({
                 'id': 'layerID',
-                'type': 'fill',
+                'type': 'line',
                 'source': 'featureCollectionID',
                 'layout': {},
                 'paint': {
-                'fill-color': '#088',
-                'fill-opacity': 0.8
-                }
+                    'line-color': '#0000FF'
+                },
+                'interactive': true
+            });
+
+            // Create a popup, but don't add it to the map yet.
+            var popup = new mapboxgl.Popup({
+                closeButton: false,
+                closeOnClick: false
+            });
+            
+            map.on('mouseenter', 'layerID', function(e) {
+                console.log(e);
+                // Change the cursor style as a UI indicator.
+                map.getCanvas().style.cursor = 'pointer';
+                
+                var coordinates = e.lngLat;
+                var name = e.features[0].properties.name;
+                
+                // // Ensure that if the map is zoomed out such that multiple
+                // // copies of the feature are visible, the popup appears
+                // // over the copy being pointed to.
+                // while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                //     coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                // }
+                
+                // Populate the popup and set its coordinates
+                // based on the feature found.
+                popup
+                    .setLngLat(coordinates)
+                    .setHTML(name)
+                    .addTo(map);
+            });
+            
+            map.on('mouseleave', 'places', function() {
+            map.getCanvas().style.cursor = '';
+            popup.remove();
             });
         });
 
