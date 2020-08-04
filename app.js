@@ -23,8 +23,16 @@ app.get('/leaflet', async(req, res) => {
   res.render("leaflet.html");
 });
 
-app.get('/mapbox', async(req, res) => {
-  res.render("mapbox.html");
+app.get('/mapboxhover', async(req, res) => {
+  res.render('mapbox/mapboxHover.html');
+});
+
+app.get('/mapboxclick', async(req, res) => {
+  res.render('mapbox/mapboxClick.html');
+});
+
+app.get('/mapboxline', async(req, res) => {
+  res.render("mapbox/mapboxLine.html");
 });
 
 app.get('/openlayers', async(req, res) => {
