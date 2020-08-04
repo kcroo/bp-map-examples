@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="public/style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src='https://api.mapbox.com/mapbox-gl-js/v1.11.1/mapbox-gl.js'></script>
+    <script src='https://api.mapbox.com/mapbox.js/plugins/turf/v2.0.2/turf.min.js'></script>
     <link href='https://api.mapbox.com/mapbox-gl-js/v1.11.1/mapbox-gl.css' rel='stylesheet' />
     <title>Document</title>
 </head>
@@ -26,21 +27,10 @@
         const map = new mapboxgl.Map({
            container: 'mapid',
            style: 'https://tiles.stadiamaps.com/styles/alidade_smooth.json',  // Theme URL; see our themes documentation for more options
-           center: [-68.13734351262877, 45.137451890638886],
-            zoom: 5
          });
 
          // Add zoom and rotation controls to the map.
          map.addControl(new mapboxgl.NavigationControl());
-
-        // zoom into CA (couldn't figure out how to zoom to polygon bounds without external library)
-        const swPoint = new mapboxgl.LngLat(-125.177210, 31.602601);
-        const nePoint = new mapboxgl.LngLat(-113.043510, 42.361381);
-        const bounds = new mapboxgl.LngLatBounds(swPoint, nePoint);
-
-        map.fitBounds(bounds, {
-            padding: 20
-        });
 
         const layers = [];
         const promises = [];
@@ -73,6 +63,13 @@
             }
 
             console.log(featureCollection);
+
+            // zoom to bounds (requires turf or geojson-extent plugin)
+            const bbox = turf.extent(featureCollection);
+
+            map.fitBounds(bbox, {
+                padding: 20
+            });
 
             // add feature collection as dat source to map
             map.addSource('featureCollectionID', {
