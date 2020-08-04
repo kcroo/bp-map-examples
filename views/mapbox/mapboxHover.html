@@ -55,42 +55,7 @@
                     }
                 });
 
-                // // creates line layers for each feature in feature collection
-                // map.addLayer({
-                //     'id': 'layerID',
-                //     'type': 'line',     // MUST be fill, otherwise click event doesn't work
-                //     'source': 'featureCollectionID',
-                //     'layout': {},
-                // });
-
-                // // *** popup displays on click ***
-                // // https://docs.mapbox.com/mapbox-gl-js/example/polygon-popup-on-click/
-                // map.on('click', 'layerID', function(e) {
-                //     console.log(e);
-
-                //     var coordinates = e.lngLat;
-                //     var name = e.features[0].properties.name;
-                    
-                //     // popup will appear where user clicked, with district name
-                //     const popup = new mapboxgl.Popup()
-                //         .setLngLat(coordinates)     // could set to middle of polygon
-                //         .setHTML(name)
-                //         .addTo(map);
-                // });
-
-                // // Change the cursor to a pointer when the mouse is over the places layer.
-                // map.on('mouseenter', 'layerID', function() {
-                //     map.getCanvas().style.cursor = 'pointer';
-                // });
-
-                // // Change it back to a pointer when it leaves.
-                // map.on('mouseleave', 'layerID', function() {
-                //     map.getCanvas().style.cursor = '';
-                // });
-
-
                 // *** popup displays on hover ***
-                // if wanted to change to mouseon, would need to manually position popup over middle of polygon
 
                 // only one popup visible on map at one time
                 const popup = new mapboxgl.Popup({
@@ -98,24 +63,28 @@
                     closeOnClick: false
                 });
 
-                map.on('mouseenter', 'layerID', function(e) {
-                    console.log(e);
-                    map.getCanvas().style.cursor = 'pointer';
+                // display popup when mouse is over districts
+                let lastFeatureName = null;
 
-                    var coordinates = e.lngLat;
-                    var name = e.features[0].properties.name;
+                // must use mousemove to instead of mouseenter for popups to update when moving between districts
+                map.on('mousemove', 'layerID', (e) => {
+                    const currentFeatureName = e.features[0].properties.name;
+                    console.log(currentFeatureName);
 
-                    // supposed to help point at specific feature being hovered over
-                    // just copy and pasted from https://docs.mapbox.com/mapbox-gl-js/example/popup-on-hover/
-                    while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-                        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                    if (currentFeatureName !== lastFeatureName) {
+                        lastFeatureName = currentFeatureName;
+                        
+                        // popup follows cursor
+                        popup
+                            .setHTML(currentFeatureName)
+                            .trackPointer()
+                            .addTo(map);
                     }
-                    
-                    // popup will appear where mouse entered polygon, with district name
-                    popup
-                        .setLngLat(coordinates)     // could set to middle of polygon
-                        .setHTML(name)
-                        .addTo(map);
+                });
+
+                // Change the cursor to a pointer when the mouse is over the places layer.
+                map.on('mouseenter', 'layerID', function() {
+                    map.getCanvas().style.cursor = 'pointer';
                 });
 
                 // Change it back to a pointer when it leaves.
