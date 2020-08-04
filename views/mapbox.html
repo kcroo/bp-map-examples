@@ -90,32 +90,65 @@
                 }
             });
 
-            // only one popup visible on map at one time
-            var popup = new mapboxgl.Popup();
+            // // *** popup displays on click ***
+            // // https://docs.mapbox.com/mapbox-gl-js/example/polygon-popup-on-click/
+            // map.on('click', 'layerID', function(e) {
+            //     console.log(e);
+ 
+            //     var coordinates = e.lngLat;
+            //     var name = e.features[0].properties.name;
+                
+            //     // popup will appear where user clicked, with district name
+            //     const popup = new mapboxgl.Popup()
+            //         .setLngLat(coordinates)     // could set to middle of polygon
+            //         .setHTML(name)
+            //         .addTo(map);
+            // });
+
+            // // Change the cursor to a pointer when the mouse is over the places layer.
+            // map.on('mouseenter', 'layerID', function() {
+            //     map.getCanvas().style.cursor = 'pointer';
+            // });
             
-            // popup displays on click 
+            // // Change it back to a pointer when it leaves.
+            // map.on('mouseleave', 'layerID', function() {
+            //     map.getCanvas().style.cursor = '';
+            // });
+
+
+            // *** popup displays on hover ***
             // if wanted to change to mouseon, would need to manually position popup over middle of polygon
-            map.on('click', 'layerID', function(e) {
+
+            // only one popup visible on map at one time
+            const popup = new mapboxgl.Popup({
+                closeButton: false,
+                closeOnClick: false
+            });
+
+            map.on('mouseenter', 'layerID', function(e) {
                 console.log(e);
+                map.getCanvas().style.cursor = 'pointer';
  
                 var coordinates = e.lngLat;
                 var name = e.features[0].properties.name;
+
+                // supposed to help point at specific feature being hovered over
+                // just copy and pasted from https://docs.mapbox.com/mapbox-gl-js/example/popup-on-hover/
+                while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                    coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                }
                 
-                // popup will appear where user clicked, with district name
+                // popup will appear where mouse entered polygon, with district name
                 popup
-                    .setLngLat(coordinates)
+                    .setLngLat(coordinates)     // could set to middle of polygon
                     .setHTML(name)
                     .addTo(map);
-            });
-
-            // Change the cursor to a pointer when the mouse is over the places layer.
-            map.on('mouseenter', 'layerID', function() {
-                map.getCanvas().style.cursor = 'pointer';
             });
             
             // Change it back to a pointer when it leaves.
             map.on('mouseleave', 'layerID', function() {
                 map.getCanvas().style.cursor = '';
+                popup.remove();
             });
             
         });
