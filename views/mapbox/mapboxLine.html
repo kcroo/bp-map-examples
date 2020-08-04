@@ -42,16 +42,26 @@
                     data: featureCollection
                 });
 
+                // creates polygon layers for each feature in feature collection
+                map.addLayer({
+                    'id': 'polyID',
+                    'type': 'fill',     // MUST be fill, otherwise click event doesn't work
+                    'source': 'featureCollectionID',
+                    'layout': {},
+                    'paint': {
+                        'fill-opacity': 0               // no outline -> must add line later
+                    }
+                });
+
                 // creates line layers for each feature in feature collection
                 map.addLayer({
-                    'id': 'layerID',
+                    'id': 'lineID',
                     'type': 'line',     // MUST be fill, otherwise click event doesn't work
                     'source': 'featureCollectionID',
                     'layout': {},
                 });
 
                 // *** popup displays on hover ***
-                // if wanted to change to mouseon, would need to manually position popup over middle of polygon
 
                 // only one popup visible on map at one time
                 const popup = new mapboxgl.Popup({
@@ -59,28 +69,32 @@
                     closeOnClick: false
                 });
 
-                map.on('mouseenter', 'layerID', function(e) {
-                    console.log(e);
-                    map.getCanvas().style.cursor = 'pointer';
+                // display popup when mouse is over districts
+                let lastFeatureName = null;
 
-                    var coordinates = e.lngLat;
-                    var name = e.features[0].properties.name;
+                // must use mousemove to instead of mouseenter for popups to update when moving between districts
+                map.on('mousemove', 'polyID', (e) => {
+                    const currentFeatureName = e.features[0].properties.name;
+                    console.log(currentFeatureName);
 
-                    // supposed to help point at specific feature being hovered over
-                    // just copy and pasted from https://docs.mapbox.com/mapbox-gl-js/example/popup-on-hover/
-                    while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-                        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                    if (currentFeatureName !== lastFeatureName) {
+                        lastFeatureName = currentFeatureName;
+                        
+                        // popup follows cursor
+                        popup
+                            .setHTML(currentFeatureName)
+                            .trackPointer()
+                            .addTo(map);
                     }
-                    
-                    // popup will appear where mouse entered polygon, with district name
-                    popup
-                        .setLngLat(coordinates)     // could set to middle of polygon
-                        .setHTML(name)
-                        .addTo(map);
+                });
+
+                // Change the cursor to a pointer when the mouse is over the places layer.
+                map.on('mouseenter', 'polyID', function() {
+                    map.getCanvas().style.cursor = 'pointer';
                 });
 
                 // Change it back to a pointer when it leaves.
-                map.on('mouseleave', 'layerID', function() {
+                map.on('mouseleave', 'polyID', function() {
                     map.getCanvas().style.cursor = '';
                     popup.remove();
                 });
