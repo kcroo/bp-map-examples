@@ -31,7 +31,8 @@
                         fillOpacity: 0,
                         weight: 2 
                     })
-                    .bindTooltip(name).openTooltip();
+                    .bindTooltip(name, { sticky: true })     // {permanent: true} to auto appear; {sticky: true} to follow mouse
+                    .openTooltip();
 
                 layers.push(district);
             })
