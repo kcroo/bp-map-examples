@@ -23,6 +23,10 @@ app.get('/leaflethover', async(req, res) => {
   res.render("leaflet/leafletHover.html");
 });
 
+app.get('/leafletclick', async(req, res) => {
+  res.render("leaflet/leafletClick.html");
+});
+
 app.get('/mapboxhover', async(req, res) => {
   res.render('mapbox/mapboxHover.html');
 });
