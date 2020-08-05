@@ -28,7 +28,9 @@
         }
 
         // create map; zoom delta controls how much it zooms in/out with each zoom
-        const map = L.map("mapid");
+        const map = L.map("mapid", {
+            zoomDelta: 0.5
+        });
 
         // after all GeoJSON files load, add them to group layer, add to map, and zoom to bounds
         getFeatureCollection().then( featureCollection => {
