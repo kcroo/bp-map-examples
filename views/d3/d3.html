@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="public/style.css">
+    <script src="/public/getData.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- <script src="https://d3js.org/d3.v5.js"></script>
+    <script src="https://d3js.org/topojson.v2.min.js"></script>
+    <title>D3</title> -->
+
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+    
+</head>
+<body>
+
+    <h2>D3</h2>
+    <!-- Create an element where the map will take place -->
+    <svg id="mapid" width="400" height="300"></svg>
+
+    <script>
+        var svg = d3.select("svg");
+        var projection = d3.geoMercator();
+
+        getFeatureCollection().then( featureCollection => {
+            console.log(featureCollection);
+
+            // Draw the map
+            svg.append("g")
+                .selectAll("path")
+                .data(featureCollection.features)
+                .enter().append("path")
+                    .attr("fill", "#69b3a2")
+                    .attr("d", d3.geoPath()
+                        .projection(projection)
+                    )
+                    .style("stroke", "#fff")
+        });
+    </script>
+</body>
+</html>

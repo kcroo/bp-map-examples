@@ -35,8 +35,16 @@ app.get('/mapboxline', async(req, res) => {
   res.render("mapbox/mapboxLine.html");
 });
 
+app.get('/mapboxlabel', async(req, res) => {
+  res.render("mapbox/mapboxLabel.html");
+});
+
 app.get('/openlayers', async(req, res) => {
   res.render("openlayers.html");
+});
+
+app.get('/d3', async(req, res) => {
+  res.render("d3/d3.html");
 });
 
 
