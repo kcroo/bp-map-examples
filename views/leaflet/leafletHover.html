@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="public/style.css">
+    <script src="/public/getData.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
     <!-- Make sure you put this AFTER Leaflet's CSS -->
@@ -19,45 +20,29 @@
     <div id="description" class="inactive description"></div>
 
     <script>
-        // returns promise for loading GeoJSON file and adding the Leaflet layer to the layers array
-        async function getGeojsonLayer(fileName, layers) {
-            // loading GeoJSON file - Here my html and usa_adm.geojson file resides in same folder
-            return $.getJSON(fileName, (data) => {
-                // L.geoJson function is used to parse geojson file and load on to map
-                const name = fileName.slice(54, -8);
-                const district = L.geoJSON(data)
-                    .setStyle({
-                        fill: true,         // if false, transparent BUT tooltip only appears on lines,
-                        fillOpacity: 0,
-                        weight: 2 
-                    })
-                    .bindTooltip(name, { sticky: true })     // {permanent: true} to auto appear; {sticky: true} to follow mouse
-                    .openTooltip();
-
-                layers.push(district);
-            })
+        // add tooltip to each feature in feature colection
+        function onEachFeature(feature, layer) {
+            if (feature.properties && feature.properties.name) {
+                layer.bindTooltip(feature.properties.name, { sticky: true });     // {permanent: true} to auto appear; {sticky: true} to follow mouse
+            }
         }
 
         // create map; zoom delta controls how much it zooms in/out with each zoom
-        const map = L.map("mapid", {
-            zoomDelta: 0.2
-        });
-
-        const layers = [];
-        const promises = [];
-
-        // get promises for each of the CA state senate districts
-        for (let i = 1; i <= 40; i++) {
-            const promise = getGeojsonLayer(`/ca_state_senate_districts/bp_california state senate district ${i}.geojson`, layers);
-            promises.push(promise);
-        }
+        const map = L.map("mapid");
 
         // after all GeoJSON files load, add them to group layer, add to map, and zoom to bounds
-        Promise.all(promises).then( () => {
-            console.log(layers);
-            const group = L.featureGroup(layers);
-            group.addTo(map);
-            map.fitBounds(group.getBounds());
+        getFeatureCollection().then( featureCollection => {
+            const districts = L.geoJSON(featureCollection, {
+                onEachFeature: onEachFeature
+            })
+            .setStyle({
+                fill: true,         // if false, transparent BUT tooltip only appears on lines,
+                fillOpacity: 0,
+                weight: 2 
+            })
+            .addTo(map);
+
+            map.fitBounds(districts.getBounds());
         });
 
         // add stadia basemap
