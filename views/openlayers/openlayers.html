@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="public/style.css">
+    <link rel="stylesheet" href="public/olStyles.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.4.0/css/ol.css" type="text/css">
     <script src="/public/getData.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -13,21 +14,44 @@
 <body>
 
     <div id="mapid"></div>
-    <div id="description" class="inactive description"></div>
+    <div id="popup" class="ol-popup">
+        <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+        <div id="popup-content"></div>
+      </div>
 
     <script>
+        const container = document.getElementById('popup');
+        const content = document.getElementById('popup-content');
+        const closer = document.getElementById('popup-closer');
+
+        var overlay = new ol.Overlay({
+            element: container,
+            autoPan: true,
+            autoPanAnimation: {
+                duration: 250,
+            },
+        });
+
+        closer.onclick = function () {
+            overlay.setPosition(undefined);
+            closer.blur();
+            return false;
+        };
+
         getFeatureCollection().then( featureCollection => {
             const features = new ol.format.GeoJSON().readFeatures(featureCollection);
+            console.log(features);
             const layer = new ol.layer.Vector({
                 source: new ol.source.Vector({
                     features: features,
                 }),
                 style: new ol.style.Style({
                     fill: new ol.style.Fill({
-                        color: [0,0,0,0]            // rgb-alpha, where alpha is 0-1 for transparency
+                        color: [0,0,0,0.5]            // rgb-alpha, where alpha is 0-1 for transparency
                     }),
                     stroke: new ol.style.Stroke({
                         color: 'red'
+                        //lineDash: [2,4]           // numbers are pixels, evidently  
                     })
                 })
             });
@@ -39,11 +63,26 @@
                         source: new ol.source.OSM()
                     }),
                     layer
-                ]
+                ],
+                overlays: [overlay]
             });
 
+            // set map extent to bounds of districts
             const extent = layer.getSource().getExtent();
             map.getView().fit(extent, map.getSize());
+
+            // set click event to trigger popup and display name in popup
+            map.on('singleclick', function (e) {
+                const feature = map.forEachFeatureAtPixel(e.pixel, (feature, layer) => {
+                    return feature;
+                });
+
+                if (feature) {
+                    const name = feature.get('name');
+                    content.innerHTML = `<p>${name}</p>`;
+                    overlay.setPosition(e.coordinate);
+                }
+            });
         });
 
     </script>

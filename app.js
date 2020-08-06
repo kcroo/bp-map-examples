@@ -44,7 +44,7 @@ app.get('/mapboxlabel', async(req, res) => {
 });
 
 app.get('/openlayers', async(req, res) => {
-  res.render("openlayers.html");
+  res.render("openlayers/openlayers.html");
 });
 
 app.get('/d3', async(req, res) => {
