@@ -17,7 +17,7 @@
 <body>
 
     <div id="mapid"></div>
-    <div id="description" class="inactive description"></div>
+    <div id="logo"></div>
 
     <script>
         // add tooltip to each feature in feature colection
@@ -52,6 +52,18 @@
             maxZoom: 20,
             attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
         }).addTo(map);
+
+        // add BP logo as 
+        const logo = L.control({
+            position: 'bottomright'}
+        );
+        logo.onAdd = (map) => {
+            const div = L.DomUtil.create('div', 'logo');
+            div.innerHTML= "<img src='public/bp_logo.jpeg'/>";
+            return div;
+        }
+        logo.addTo(map);
+        
     </script>
 </body>
 </html>
