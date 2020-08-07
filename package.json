@@ -11,6 +11,7 @@
     "express": "^4.16.3",
     "latest-version": "^5.1.0",
     "nunjucks": "^3.2.1",
-    "ol": "^6.4.1"
+    "ol": "^6.4.1",
+    "topojson": "^3.0.2"
   }
 }

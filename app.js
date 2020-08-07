@@ -19,6 +19,10 @@ nunjucks.configure('views', {
   express: app
  });
 
+ app.get('/', async(req, res) => {
+  res.render("index.html");
+});
+
 app.get('/leaflethover', async(req, res) => {
   res.render("leaflet/leafletHover.html");
 });
