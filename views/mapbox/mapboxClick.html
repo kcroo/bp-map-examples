@@ -17,34 +17,20 @@
 
     <script>
         getFeatureCollection().then( featureCollection => {
-            // zoom to bounds (requires turf or geojson-extent plugin)
-            const bbox = turf.extent(featureCollection);
-
             // adding OSM tiles is more difficult than just using mapbox basemaps (but they require API key)
             // couldn't figure out how to attach API key to stadia maps request
             const map = new mapboxgl.Map({
                 container: 'mapid',
-                style: {
-                    version: 8,
-                    sources: {
-                        osm: {
-                            type: 'raster',
-                            tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"]
-                        }
-                    },
-                    layers: [{
-                        id: 'osm',
-                        type: 'raster',
-                        source: 'osm',
-                    }]
-                }
+                style: 'https://tiles.stadiamaps.com/styles/osm_bright.json'
+            });
+
+            // fit to bounds of GeoJSON features (requires turf or geojson-extent plugin)
+            map.fitBounds(turf.extent(featureCollection), {
+                padding: 20
             });
 
             map.on('load', () => {
-                // fit to bounds of GeoJSON features
-                map.fitBounds(bbox, {
-                    padding: 20
-                });
+
 
                 // Add zoom and rotation controls to the map.
                 map.addControl(new mapboxgl.NavigationControl());
