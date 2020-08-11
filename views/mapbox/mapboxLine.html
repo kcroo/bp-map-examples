@@ -30,20 +30,7 @@
             // couldn't figure out how to attach API key to stadia maps request
             const map = new mapboxgl.Map({
                 container: 'mapid',
-                style: {
-                    version: 8,
-                    sources: {
-                        osm: {
-                            type: 'raster',
-                            tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"]
-                        }
-                    },
-                    layers: [{
-                        id: 'osm',
-                        type: 'raster',
-                        source: 'osm',
-                    }]
-                }
+                style: 'https://tiles.stadiamaps.com/styles/alidade_smooth.json'
             });
 
             map.on('load', () => {
