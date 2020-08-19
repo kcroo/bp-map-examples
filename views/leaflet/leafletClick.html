@@ -47,11 +47,29 @@
             map.fitBounds(districts.getBounds());
         });
 
-        // add OSM basemap
-        L.tileLayer('https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png', {
+        // create basemap
+        const tileLayer = L.tileLayer('https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png', {
             maxZoom: 20,
             attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
-        }).addTo(map);
+        });
+
+        console.log(tileLayer);
+
+        // get # of tiles --> calculate pricing
+        // source: https://stackoverflow.com/questions/62792352/leaflet-how-many-tiles-are-loaded-when-map-is-loading-for-the-first-time
+        let tileCount = 0;
+
+        tileLayer.on('tileload', () => { 
+            tileCount++; 
+        });
+        
+        tileLayer.once('load', () => { 
+            console.log(`Number of tiles: ${tileCount}`);
+            // Detach all event handlers for the 'tileload' event since they're not needed anymore
+            tileLayer.off('tileload');
+        });
+
+        tileLayer.addTo(map);
 
         // add BP logo as 
         const logo = L.control({
