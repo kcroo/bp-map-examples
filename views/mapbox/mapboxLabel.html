@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="public/style.css">
+    <script src="/public/getData.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src='https://api.mapbox.com/mapbox-gl-js/v1.11.1/mapbox-gl.js'></script>
+    <script src='https://api.mapbox.com/mapbox.js/plugins/turf/v2.0.2/turf.min.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v1.11.1/mapbox-gl.css' rel='stylesheet' />
+    <title>Mapbox - Popups on Click</title>
+</head>
+<body>
+    <h2>Mapbox - Popups on Click</h2>
+    <div id="mapid">
+        <!-- CSS positions logo over map in bottom right corner -->
+        <div id="logo">
+            <img src="public/bp_logo.jpeg">
+        </div>
+    </div>
+
+    <script>
+        getFeatureCollection().then( featureCollection => {
+            // adding OSM tiles is more difficult than just using mapbox basemaps (but they require API key)
+            // couldn't figure out how to attach API key to stadia maps request
+            const map = new mapboxgl.Map({
+                container: 'mapid',
+                style: 'https://tiles.stadiamaps.com/styles/osm_bright.json'
+            });
+
+            // fit to bounds of GeoJSON features (requires turf or geojson-extent plugin)
+            map.fitBounds(turf.extent(featureCollection), {
+                padding: 20
+            });
+
+            map.on('load', () => {
+                // Add zoom and rotation controls to the map.
+                map.addControl(new mapboxgl.NavigationControl());
+
+                // add feature collection as dat source to map
+                map.addSource('featureCollectionID', {
+                    type: 'geojson',
+                    data: featureCollection
+                });
+
+                for (let i = 1; i <= 20; i++) {
+                    map.addLayer({
+                        'id': `layer${i}ID`,
+                        'type': 'symbol',
+                        'source': 'featureCollectionID',
+                        'layout': {
+                            'text-field': '{name}'
+                        },
+                        'filter': ['==', 'name', `District ${i}`]
+                    });
+                }
+
+                // // creates polygon layers for each feature in feature collection
+                // map.addLayer({
+                //     'id': 'layerID',
+                //     'type': 'symbol',     
+                //     'source': 'featureCollectionID',
+                //     'layout': {
+                //         'text-field': "{name}"
+                //     }
+                // });
+
+                // // *** popup displays on click ***
+                // // https://docs.mapbox.com/mapbox-gl-js/example/polygon-popup-on-click/
+                // map.on('click', 'layerID', function(e) {
+                //     console.log(e);
+
+                //     var coordinates = e.lngLat;
+                //     var name = e.features[0].properties.name;
+                    
+                //     // popup will appear where user clicked, with district name
+                //     const popup = new mapboxgl.Popup()
+                //         .setLngLat(coordinates)     // could set to middle of polygon
+                //         .setHTML(name)
+                //         .addTo(map);
+                // });
+
+                // // Change the cursor to a pointer when the mouse is over the places layer.
+                // map.on('mouseenter', 'layerID', function() {
+                //     map.getCanvas().style.cursor = 'pointer';
+                // });
+
+                // // Change it back to a pointer when it leaves.
+                // map.on('mouseleave', 'layerID', function() {
+                //     map.getCanvas().style.cursor = '';
+                // });
+            });
+        });
+    </script>
+</body>
+</html>
+
