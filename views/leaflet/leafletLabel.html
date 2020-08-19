@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="public/style.css">
+    <script src="/public/getData.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+    integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+    crossorigin=""></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-ajax/2.1.0/leaflet.ajax.js"></script>
+    <title>Leaflet - Labels</title>
+</head>
+<body>
+    <h2>Leaflet - Labels</h2>
+    <div id="mapid"></div>
+    <div id="logo"></div>
+
+    <script>
+        // add tooltip to each feature in feature colection
+        function onEachFeature(feature, layer) {
+            if (feature.properties && feature.properties.name) {
+                layer.bindTooltip(feature.properties.name, {
+                    permanent: true, 
+                    className: 'label',
+                    direction: 'center'
+                });
+            }
+        }
+
+        // create map; zoom delta controls how much it zooms in/out with each zoom
+        const map = L.map("mapid", {
+            zoomDelta: 0.5
+        });
+
+        // after all GeoJSON files load, add them to group layer, add to map, and zoom to bounds
+        getFeatureCollection().then( featureCollection => {
+            const districts = L.geoJSON(featureCollection, {
+                onEachFeature: onEachFeature
+            })
+            .setStyle({
+                fill: true,         // if false, transparent BUT tooltip only appears on lines,
+                fillOpacity: 0,
+                weight: 2 
+            })
+            .addTo(map);
+
+            map.fitBounds(districts.getBounds());
+        });
+
+        // create basemap
+        const tileLayer = L.tileLayer('https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png', {
+            maxZoom: 20,
+            attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+        });
+
+        console.log(tileLayer);
+
+        // get # of tiles --> calculate pricing
+        // source: https://stackoverflow.com/questions/62792352/leaflet-how-many-tiles-are-loaded-when-map-is-loading-for-the-first-time
+        let tileCount = 0;
+
+        tileLayer.on('tileload', () => { 
+            tileCount++; 
+        });
+        
+        tileLayer.once('load', () => { 
+            console.log(`Number of tiles: ${tileCount}`);
+            // Detach all event handlers for the 'tileload' event since they're not needed anymore
+            tileLayer.off('tileload');
+        });
+
+        tileLayer.addTo(map);
+
+        // add BP logo as 
+        const logo = L.control({
+            position: 'bottomright'}
+        );
+        logo.onAdd = (map) => {
+            const div = L.DomUtil.create('div', 'logo');
+            div.innerHTML= "<img src='public/bp_logo.jpeg'/>";
+            return div;
+        }
+        logo.addTo(map);
+        
+    </script>
+</body>
+</html>
+

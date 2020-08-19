@@ -27,4 +27,11 @@ h2 {
 img {
     width: 100px;
     height: 100px;
-  }
+}
+
+.leaflet-tooltip.label {
+    background-color: white;
+    border: transparent;
+    box-shadow: none;
+    text-decoration: underline red;
+}

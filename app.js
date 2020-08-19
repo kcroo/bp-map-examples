@@ -31,6 +31,10 @@ app.get('/leafletclick', async(req, res) => {
   res.render("leaflet/leafletClick.html");
 });
 
+app.get('/leafletlabel', async(req, res) => {
+  res.render("leaflet/leafletLabel.html");
+});
+
 app.get('/mapboxhover', async(req, res) => {
   res.render('mapbox/mapboxHover.html');
 });
