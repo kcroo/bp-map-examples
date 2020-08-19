@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="public/style.css">
+    <script src="/public/getData.js"></script>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.16/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.16/"></script>
+    <title>ESRI</title>
+</head>
+<body>
+    <h2>ESRI</h2>
+    <div id="mapid"></div>
+    <div id="logo"></div>
+
+    <script>
+        // add tooltip to each feature in feature colection
+        function onEachFeature(feature, layer) {
+            if (feature.properties && feature.properties.name) {
+                layer.bindPopup(feature.properties.name);     // {permanent: true} to auto appear; {sticky: true} to follow mouse
+            }
+        }
+
+        require([
+            "esri/layers/GeoJSONLayer",
+            "esri/Map", 
+            "esri/views/MapView"
+            ], function (GeoJSONLayer, Map, MapView) {
+                var map = new Map({
+                    basemap: "streets-navigation-vector"
+                });
+
+                var view = new MapView({
+                    container: "mapid",
+                    map: map,
+                    center: [-118.805, 34.027], // longitude, latitude
+                    zoom: 13
+                });
+
+                getFeatureCollection().then( featureCollection => {
+                    const geoJSONLayer = new GeoJSONLayer({
+                        url: featureCollection
+                    });
+
+                    map.add(geoJSONLayer);
+                });
+
+                // const geoJSONLayer = new GeoJSONLayer({
+                //     url: "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson",
+                //     copyright: "USGS Earthquakes",
+                // });
+
+                // map.add(geoJSONLayer);
+        });
+
+        // // after all GeoJSON files load, add them to group layer, add to map, and zoom to bounds
+        // getFeatureCollection().then( featureCollection => {
+        //     const districts = L.geoJSON(featureCollection, {
+        //         onEachFeature: onEachFeature
+        //     })
+        //     .setStyle({
+        //         fill: true,         // if false, transparent BUT tooltip only appears on lines,
+        //         fillOpacity: 0,
+        //         weight: 2 
+        //     })
+        //     .addTo(map);
+
+        //     map.fitBounds(districts.getBounds());
+        // });
+
+        // // create basemap
+        // const tileLayer = L.tileLayer('https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png', {
+        //     maxZoom: 20,
+        //     attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+        // });
+
+        // console.log(tileLayer);
+
+        // // get # of tiles --> calculate pricing
+        // // source: https://stackoverflow.com/questions/62792352/leaflet-how-many-tiles-are-loaded-when-map-is-loading-for-the-first-time
+        // let tileCount = 0;
+
+        // tileLayer.on('tileload', () => { 
+        //     tileCount++; 
+        // });
+        
+        // tileLayer.once('load', () => { 
+        //     console.log(`Number of tiles: ${tileCount}`);
+        //     // Detach all event handlers for the 'tileload' event since they're not needed anymore
+        //     tileLayer.off('tileload');
+        // });
+
+        // tileLayer.addTo(map);
+
+        // // add BP logo as 
+        // const logo = L.control({
+        //     position: 'bottomright'}
+        // );
+        // logo.onAdd = (map) => {
+        //     const div = L.DomUtil.create('div', 'logo');
+        //     div.innerHTML= "<img src='public/bp_logo.jpeg'/>";
+        //     return div;
+        // }
+        // logo.addTo(map);
+        
+    </script>
+</body>
+</html>
+

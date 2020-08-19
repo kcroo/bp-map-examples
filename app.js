@@ -59,6 +59,10 @@ app.get('/d3', async(req, res) => {
   res.render("d3/d3.html");
 });
 
+app.get('/esri', async(req, res) => {
+  res.render("esri/esri.html");
+});
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
